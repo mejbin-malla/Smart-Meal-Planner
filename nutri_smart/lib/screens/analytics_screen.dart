@@ -65,10 +65,6 @@ class AnalyticsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-            const Text("Goal Achievement Rate", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
-            _buildAchievementCard(context),
-            const SizedBox(height: 24),
             _buildMacroDistribution(mealProvider),
           ],
         ),
@@ -86,44 +82,6 @@ class AnalyticsScreen extends StatelessWidget {
 
   double _getMaxY(List<double> data) {
     return data.reduce((a, b) => a > b ? a : b);
-  }
-
-  Widget _buildAchievementCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                const SizedBox(
-                  height: 80,
-                  width: 80,
-                  child: CircularProgressIndicator(
-                    value: 0.85,
-                    strokeWidth: 8,
-                    color: AppColors.secondary,
-                  ),
-                ),
-                Text("85%", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(width: 24),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Looking Great!", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text("You hit your calorie goals 6 out of the last 7 days. Keep it up!", style: TextStyle(fontSize: 12, color: Colors.grey)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _buildMacroDistribution(MealProvider provider) {

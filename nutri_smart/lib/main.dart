@@ -7,7 +7,7 @@ import 'providers/meal_provider.dart';
 import 'providers/food_provider.dart';
 import 'themes/app_theme.dart';
 import 'screens/splash_screen.dart';
-import 'screens/onboarding_screen.dart';
+import 'screens/auth_screen.dart';
 import 'screens/main_screen.dart';
 
 void main() async {
@@ -33,7 +33,6 @@ class NutriSmartApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
 
     return MaterialApp(
       title: 'NutriSmart',
@@ -41,13 +40,47 @@ class NutriSmartApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: userProvider.isAuthenticated 
-          ? const MainScreen() 
-          : const SplashScreen(),
+      home: const AuthWrapper(),
       routes: {
-        '/onboarding': (context) => const OnboardingScreen(),
+        '/auth': (context) => const AuthScreen(),
         '/home': (context) => const MainScreen(),
       },
     );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() => _showSplash = false);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showSplash) {
+      return const SplashScreen();
+    }
+
+    final userProvider = Provider.of<UserProvider>(context);
+    
+    if (userProvider.isAuthenticated) {
+      return const MainScreen();
+    } else {
+      return const AuthScreen();
+    }
   }
 }

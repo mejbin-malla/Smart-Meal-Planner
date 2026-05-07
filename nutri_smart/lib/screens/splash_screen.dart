@@ -23,20 +23,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
-
-    _navigateToNext();
-  }
-
-  void _navigateToNext() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (userProvider.isAuthenticated) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/onboarding');
-    }
   }
 
   @override

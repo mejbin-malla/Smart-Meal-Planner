@@ -5,10 +5,13 @@ import '../constants/app_constants.dart';
 
 class UserProvider extends ChangeNotifier {
   UserProfile? _user;
+  bool _isLoggedIn = false;
   final Box<UserProfile> _userBox = Hive.box<UserProfile>(AppConstants.userBox);
+  final Box<int> _settingsBox = Hive.box<int>(AppConstants.settingsBox); // Reusing settings box
 
   UserProfile? get user => _user;
-  bool get isAuthenticated => _user != null;
+  bool get isAuthenticated => _isLoggedIn && _user != null;
+  bool get hasProfile => _userBox.isNotEmpty;
 
   UserProvider() {
     _loadUser();
@@ -17,15 +20,36 @@ class UserProvider extends ChangeNotifier {
   void _loadUser() {
     if (_userBox.isNotEmpty) {
       _user = _userBox.getAt(0);
+      _isLoggedIn = _settingsBox.get('isLoggedIn', defaultValue: 0) == 1;
       notifyListeners();
     }
   }
 
-  Future<void> setupProfile(UserProfile profile) async {
+  Future<String?> register(UserProfile profile) async {
     await _userBox.clear();
     await _userBox.add(profile);
     _user = profile;
+    _isLoggedIn = true;
+    await _settingsBox.put('isLoggedIn', 1);
     notifyListeners();
+    return null;
+  }
+
+  Future<String?> login(String name, String password) async {
+    if (_userBox.isEmpty) return "No user found. Please register.";
+    final user = _userBox.getAt(0);
+    if (user?.name == name && user?.password == password) {
+      _user = user;
+      _isLoggedIn = true;
+      await _settingsBox.put('isLoggedIn', 1);
+      notifyListeners();
+      return null;
+    }
+    return "Invalid name or password.";
+  }
+
+  Future<void> setupProfile(UserProfile profile) async {
+    await register(profile);
   }
 
   Future<void> updateGoals({
@@ -45,7 +69,8 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _userBox.clear();
+    _isLoggedIn = false;
+    await _settingsBox.put('isLoggedIn', 0);
     _user = null;
     notifyListeners();
   }

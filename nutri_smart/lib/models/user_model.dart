@@ -30,6 +30,9 @@ class UserProfile extends HiveObject {
   
   @HiveField(8)
   double fatGoal;
+  
+  @HiveField(9)
+  String? password;
 
   UserProfile({
     required this.name,
@@ -41,5 +44,6 @@ class UserProfile extends HiveObject {
     required this.proteinGoal,
     required this.carbGoal,
     required this.fatGoal,
+    this.password,
   });
 }
