@@ -24,10 +24,18 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 32),
           const Text("Nutrition Goals", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          _buildGoalItem(context, "Daily Calories", "${user.calorieGoal.toInt()} kcal", Icons.local_fire_department, AppColors.calories),
-          _buildGoalItem(context, "Protein Goal", "${user.proteinGoal.toInt()}g", Icons.fitness_center, AppColors.protein),
-          _buildGoalItem(context, "Carbs Goal", "${user.carbGoal.toInt()}g", Icons.grain, AppColors.carbs),
-          _buildGoalItem(context, "Fats Goal", "${user.fatGoal.toInt()}g", Icons.opacity, AppColors.fats),
+          _buildGoalItem(context, "Daily Calories", "${user.calorieGoal.toInt()} kcal", Icons.local_fire_department, AppColors.calories, () {
+            _showEditGoalDialog(context, "Calorie Goal", user.calorieGoal, (v) => userProvider.updateGoals(calories: v, protein: user.proteinGoal, carbs: user.carbGoal, fats: user.fatGoal));
+          }),
+          _buildGoalItem(context, "Protein Goal", "${user.proteinGoal.toInt()}g", Icons.fitness_center, AppColors.protein, () {
+            _showEditGoalDialog(context, "Protein Goal", user.proteinGoal, (v) => userProvider.updateGoals(calories: user.calorieGoal, protein: v, carbs: user.carbGoal, fats: user.fatGoal));
+          }),
+          _buildGoalItem(context, "Carbs Goal", "${user.carbGoal.toInt()}g", Icons.grain, AppColors.carbs, () {
+            _showEditGoalDialog(context, "Carbs Goal", user.carbGoal, (v) => userProvider.updateGoals(calories: user.calorieGoal, protein: user.proteinGoal, carbs: v, fats: user.fatGoal));
+          }),
+          _buildGoalItem(context, "Fats Goal", "${user.fatGoal.toInt()}g", Icons.opacity, AppColors.fats, () {
+            _showEditGoalDialog(context, "Fats Goal", user.fatGoal, (v) => userProvider.updateGoals(calories: user.calorieGoal, protein: user.proteinGoal, carbs: user.carbGoal, fats: v));
+          }),
           const SizedBox(height: 32),
           const Text("Settings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
@@ -37,11 +45,6 @@ class ProfileScreen extends StatelessWidget {
             secondary: const Icon(Icons.dark_mode),
             value: themeProvider.isDarkMode,
             onChanged: (v) => themeProvider.toggleTheme(),
-          ),
-          ListTile(
-            title: const Text("Export Data"),
-            leading: const Icon(Icons.download),
-            onTap: () {},
           ),
           ListTile(
             title: const Text("Logout"),
@@ -68,16 +71,42 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalItem(BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildGoalItem(BuildContext context, String label, String value, IconData icon, Color color, Function() onTap) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: Icon(icon, color: color),
         title: Text(label),
         trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        onTap: () {
-          // Logic to edit goal
-        },
+        onTap: onTap,
+      ),
+    );
+  }
+
+  void _showEditGoalDialog(BuildContext context, String title, double currentVal, Function(double) onSave) {
+    final controller = TextEditingController(text: currentVal.toInt().toString());
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit $title"),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: "Enter Goal Value"),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () {
+              final val = double.tryParse(controller.text);
+              if (val != null && val > 0) {
+                onSave(val);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Save"),
+          ),
+        ],
       ),
     );
   }

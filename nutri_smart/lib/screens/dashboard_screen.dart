@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'meal_entry_screen.dart';
+import 'search_filter_screen.dart';
 import '../providers/meal_provider.dart';
 import '../providers/user_provider.dart';
 import '../constants/app_constants.dart';
@@ -27,24 +28,32 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("NutriSmart Dashboard"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Hello, ${user.name}!",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hello, ${user.name}!",
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text("Track your nutrition goals for today."),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search, color: AppColors.primary),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchFilterScreen())),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            const Text("Track your nutrition goals for today."),
             const SizedBox(height: 24),
             
             DailySummaryCard(
